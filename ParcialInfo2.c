@@ -28,20 +28,22 @@ void Mostrarvuelos(struct Vuelo *vuelos, int total) {
     }
 }
 
-void Radio(struct Vuelo *p, float R, int total) {
-    float bajo = R - (R / 2.0f);
-    float alto = R + (R / 2.0f);
+void BuscarPorFrecuencia(struct Vuelo *p, float frecBuscada, float porcentaje, int total) {
+    float margen = frecBuscada * (porcentaje / 100.0f);
+    float minimo = frecBuscada - margen;
+    float maximo = frecBuscada + margen;
     int encontrados = 0;
 
+    printf("\nBuscando vuelos entre %.2f MHz y %.2f MHz:\n", minimo, maximo);
     for (int i = 0; i < total; i++) {
-        if (p[i].Distancia >= bajo && p[i].Distancia <= alto) {
-            printf("Vuelo %d (%s) - Frecuencia: %.2f MHz - Distancia: %.2f km\n",
+        if (p[i].FrecuenciaRadio >= minimo && p[i].FrecuenciaRadio <= maximo) {
+            printf("- Vuelo %d: %s | Frecuencia: %.2f MHz | Distancia: %.2f km\n",
                    i + 1, p[i].Nombrevuelo, p[i].FrecuenciaRadio, p[i].Distancia);
             encontrados++;
         }
     }
     if (encontrados == 0) {
-        printf("No hay vuelos en este rango.\n");
+        printf("No se encontraron vuelos dentro de ese porcentaje.\n");
     }
 }
 
@@ -87,10 +89,13 @@ int main() {
                 Solicitar_datos(Bvuelo, totalVuelos, totalVuelos + nuevos);
                 totalVuelos += nuevos;
             }
-        } else if (opcion == 2) {
-            printf("Coloque el radio para buscar frecuencias: ");
-            scanf("%f", &radio);
-            Radio(Bvuelo, radio, totalVuelos);
+        } } else if (opcion == 2) {
+            float frecBuscada = 0, porcentaje = 0;
+            printf("Ingrese la frecuencia de radio a buscar (MHz): ");
+            scanf("%f", &frecBuscada);
+            printf("Ingrese el porcentaje de tolerancia (ej. 10 para 10%%): ");
+            scanf("%f", &porcentaje);
+            BuscarPorFrecuencia(Bvuelo, frecBuscada, porcentaje, totalVuelos);
         } else if (opcion == 3) {
             Mostrarvuelos(Bvuelo, totalVuelos);
         } else if (opcion != 4) {
