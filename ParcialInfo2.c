@@ -1,3 +1,4 @@
+// Codigo del Parcial modificado para reconocer errores y aplicar los conocimientos aplicados en clase, se han corregido los errores principales
 #include <stdio.h>
 #include <stdlib.h>
 
