@@ -2,6 +2,10 @@
 #include <stdlib.h>
 
 #define MAX_NOMBRE 30
+void limpiarBuffer(void) {
+    int c;
+    while ((c = getchar()) != '\n' && c != EOF);
+}
 
 struct Vuelo {
     char Nombrevuelo[MAX_NOMBRE];
