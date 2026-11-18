@@ -1,101 +1,103 @@
 #include <stdio.h>
-#include<stdlib.h>
+#include <stdlib.h>
+
+#define MAX_NOMBRE 30
+
 struct Vuelo {
-	char Nombrevuelo[30];
-	float FrecuenciaRadio;
-	float Distancia;
-	
+    char Nombrevuelo[MAX_NOMBRE];
+    float FrecuenciaRadio;
+    float Distancia;
 };
-void Solicitar_datos(struct Vuelo *p, int N ) {
-	int i=0;
-	for (i;i<N;i++){
-		printf("Datos vuelo nro %i \n",i+1);
-		printf("Nombre del vuelo: ");
-		scanf("%s", p[i].Nombrevuelo);
-		printf("Frecuencia de Radio: \n");
-		scanf("%f",&p[i].FrecuenciaRadio);
-		printf("Distancia del vuelo: \n");
-		scanf("%f",&p[i].FrecuenciaRadio);
-	}
 
-}
-void ReSolicitar_datos(struct Vuelo *p, int N, int M ) {
-	int i=N+1;
-	for (i;i<N+M;i++){
-		printf("Datos vuelo nro %i",i+1);
-		printf("Nombre del vuelo: ");
-		scanf("%s", p[i].Nombrevuelo);
-		printf("Frecuencia de Radio: ");
-		scanf("%f",&p[i].FrecuenciaRadio);
-		printf("Distancia del vuelo: ");
-		scanf("%f",&p[i].FrecuenciaRadio);
-		N++;
-	}
-}
-void Mostrarvuelos (struct Vuelo *c, int N, int M) {
-	int i=0;
-	for (i;i<M+N;i++) {
-		printf("Vuelo %i ", i+1);
-		printf("Frecuencia de radio %f", c[i].FrecuenciaRadio);
-		printf("Distancia del vuelo %i:  %f ", i+1, c[i].Distancia);
-	}
+void Solicitar_datos(struct Vuelo *p, int inicio, int cantidad) {
+    for (int i = inicio; i < cantidad; i++) {
+        printf("\nDatos vuelo nro %d\n", i + 1);
+        printf("Nombre del vuelo: ");
+        scanf("%29s", p[i].Nombrevuelo);
+        printf("Frecuencia de Radio (MHz): ");
+        scanf("%f", &p[i].FrecuenciaRadio);
+        printf("Distancia del vuelo (km): ");
+        scanf("%f", &p[i].Distancia);
+    }
 }
 
-
-void Radio(struct Vuelo *p, int R,int M, int N){
-	int bajo;
-	int alto;
-	int i=0;
-	bajo=R-(R/2);
-	alto=R+(R/2);
-	
-	for (i; i<M+N; i++) {
-		if (p[i].Distancia<bajo && p[i].Distancia>alto) {
-			printf("Frecuencia de vuelo %i %f",i+1, p[i].FrecuenciaRadio);
-		} else {
-			printf("No hay frecuencias en este radio");
-		}
-	}
+void Mostrarvuelos(struct Vuelo *vuelos, int total) {
+    for (int i = 0; i < total; i++) {
+        printf("\nVuelo %d: %s | Frecuencia: %.2f MHz | Distancia: %.2f km\n",
+               i + 1, vuelos[i].Nombrevuelo, vuelos[i].FrecuenciaRadio, vuelos[i].Distancia);
+    }
 }
 
+void Radio(struct Vuelo *p, float R, int total) {
+    float bajo = R - (R / 2.0f);
+    float alto = R + (R / 2.0f);
+    int encontrados = 0;
 
-	
+    for (int i = 0; i < total; i++) {
+        if (p[i].Distancia >= bajo && p[i].Distancia <= alto) {
+            printf("Vuelo %d (%s) - Frecuencia: %.2f MHz - Distancia: %.2f km\n",
+                   i + 1, p[i].Nombrevuelo, p[i].FrecuenciaRadio, p[i].Distancia);
+            encontrados++;
+        }
+    }
+    if (encontrados == 0) {
+        printf("No hay vuelos en este rango.\n");
+    }
+}
+
 int main() {
+    struct Vuelo *Bvuelo = NULL;
+    int totalVuelos = 0;
+    int nuevos = 0;
+    int opcion = 0;
+    float radio = 0;
 
-struct Vuelo Bvuelo;
-int M;
-int N;
-int radio;
+    printf("Coloque la cantidad de vuelos iniciales: ");
+    scanf("%d", &totalVuelos);
 
+    if (totalVuelos > 0) {
+        Bvuelo = (struct Vuelo *) malloc(totalVuelos * sizeof(struct Vuelo));
+        if (Bvuelo == NULL) {
+            printf("Error al asignar memoria.\n");
+            return 1;
+        }
+        Solicitar_datos(Bvuelo, 0, totalVuelos);
+    }
 
-Bvuelo.FrecuenciaRadio=0;
-Bvuelo.Distancia=0;
-printf("Coloque la cantidad de vuelos que quiere realizar \n");
-scanf("%i",&N);
-Solicitar_datos(&Bvuelo,N);
-printf("Opciones");
-printf("Para agregar otro vuelo presione 1 \n");
-printf("Para saber cual es la frecuencia de radio mas cercana presione 2 \n");
-printf("Para ver los vuelos subidos presione 3");
-scanf("%i",&M);
-if (M==1){
-		
-	printf("Cuantos desea ingresar?");
-	scanf("%i",&M);
+    do {
+        printf("\n--- Opciones ---\n");
+        printf("1. Agregar otro/s vuelo/s\n");
+        printf("2. Buscar vuelos por radio\n");
+        printf("3. Ver los vuelos subidos\n");
+        printf("4. Salir\n");
+        printf("Opcion: ");
+        scanf("%d", &opcion);
 
-	ReSolicitar_datos(&Bvuelo,N,M);
-	
-	
-} else if (M==2) {
-	printf("Coloque el radio para buscar frecuencias");
-	scanf("%i", &radio);
-	Radio (&Bvuelo, radio, M, N);
+        if (opcion == 1) {
+            printf("Cuantos vuelos desea ingresar?: ");
+            scanf("%d", &nuevos);
+            if (nuevos > 0) {
+                struct Vuelo *temp = (struct Vuelo *) realloc(Bvuelo, (totalVuelos + nuevos) * sizeof(struct Vuelo));
+                if (temp == NULL) {
+                    printf("Error al redimensionar memoria.\n");
+                    free(Bvuelo);
+                    return 1;
+                }
+                Bvuelo = temp;
+                Solicitar_datos(Bvuelo, totalVuelos, totalVuelos + nuevos);
+                totalVuelos += nuevos;
+            }
+        } else if (opcion == 2) {
+            printf("Coloque el radio para buscar frecuencias: ");
+            scanf("%f", &radio);
+            Radio(Bvuelo, radio, totalVuelos);
+        } else if (opcion == 3) {
+            Mostrarvuelos(Bvuelo, totalVuelos);
+        } else if (opcion != 4) {
+            printf("Respuesta invalida. Intente nuevamente.\n");
+        }
+    } while (opcion != 4);
 
-}else if (M==3) {
-	Mostrarvuelos(&Bvuelo,N,M);
-} 
-else ("Respuesta invalida. Intente nuevamente");
-
-	return 0;
+    free(Bvuelo);
+    return 0;
 }
-
